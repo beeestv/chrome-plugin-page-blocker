@@ -1,0 +1,19 @@
+{
+  "name": "Page Blocker",
+  "description": "A chrome plugin to block some pages, in order to avoid loafing on the job.",
+  "version": "0.1",
+  "permissions": [
+        "tabs",
+        "activeTab",
+		"storage"
+    ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_title": "Page Blocker",
+	"default_icon": "icon-true.png"
+  },
+  "manifest_version": 2
+}
