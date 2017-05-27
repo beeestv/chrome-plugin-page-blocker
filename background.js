@@ -1,34 +1,29 @@
-var enable;
 var blackList=[
-	'weibo', 
-	'v2ex', 
+	'weibo',
+	'v2ex',
 	'qzone',
 	'tieba.baidu.com'
 	];
-	
-chrome.storage.local.get({"enable":true}, function(items){
-	enable = items.enable;
-	chrome.browserAction.setIcon({path:"icon-" + enable + ".png"});
-});
-chrome.browserAction.onClicked.addListener(function(tab) {
-	chrome.storage.local.set({"enable":!enable},function(){
-		enable = !enable;
-		chrome.browserAction.setIcon({path:"icon-" + enable + ".png"});
-	});
-});
+var warningId = 'notification.warning';
 
-chrome.tabs.onCreated.addListener(function(tab) {
-	if (!enable) return;
-	if (doBlock(tab.url)) {
-		execute(tab.id, tab.url);
-	}
-});
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-	if (!enable) return;
-	if (doBlock(tab.url)) {
-		execute(tabId, tab.url);
-	}
-});
+function hideWarning(done) {
+    chrome.notifications.clear(warningId, function() {
+        if (done) done();
+    });
+}
+
+function showWarning() {
+    hideWarning(function() {
+        chrome.notifications.create(warningId, {
+            title: 'Page Blocker',
+            type: 'basic',
+            message: '滚去工作啊！！',
+            buttons: [{ title: 'Learn More' }],
+            isClickable: true,
+            priority: 2,
+        }, function() {});
+    });
+}
 
 function doBlock(url) {
 	for (index in blackList) {
@@ -37,7 +32,7 @@ function doBlock(url) {
 				alert('工作之余');
 				return false;
 			}
-			return true;	
+			return true;
 		}
 	}
 	return false;
@@ -45,7 +40,9 @@ function doBlock(url) {
 
 function execute(tabId, url) {
 	chrome.tabs.remove(tabId, function(){
-		alert('滚去工作啊！！');
+        chrome.storage.local.get('alertText', function (items) {
+			alert(items.alertText ? items.alertText : "滚去工作啊！！！");
+        })
 	});
 }
 
@@ -75,3 +72,24 @@ function time_range(beginTime, endTime) {
         return false;
     }
 }
+
+chrome.storage.local.get({"enable":true}, function(items){
+    chrome.browserAction.setIcon({path:"icon-" + items.enable + ".png"});
+});
+
+chrome.tabs.onCreated.addListener(function(tab) {
+    chrome.storage.local.get({"enable":true}, function(items){
+        if (!item.enable) return;
+        if (doBlock(tab.url)) {
+            execute(tab.id, tab.url);
+        }
+    });
+});
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    chrome.storage.local.get({"enable":true}, function(items){
+        if (!items.enable) return;
+        if (doBlock(tab.url)) {
+            execute(tabId, tab.url);
+        }
+    });
+});
