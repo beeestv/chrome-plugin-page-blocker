@@ -1,31 +1,34 @@
 var warningId = 'notification.warning';
+var alertMessage;
 
-function hideWarning(done) {
-    chrome.notifications.clear(warningId, function () {
-        if (done) done();
-    });
-}
-
-function showWarning() {
-    hideWarning(function () {
-        chrome.notifications.create(warningId, {
-            title: 'Page Blocker',
-            type: 'basic',
-            message: '滚去工作啊！！',
-            buttons: [{title: 'Learn More'}],
-            isClickable: true,
-            priority: 2,
-        }, function () {
-        });
-    });
-}
+// function hideWarning(done) {
+//     chrome.notifications.clear(warningId, function () {
+//         if (done) done();
+//     });
+// }
+//
+// function showWarning() {
+//     hideWarning(function () {
+//         chrome.notifications.create(warningId, {
+//             title: 'Page Blocker',
+//             type: 'basic',
+//             message: '滚去工作啊！！',
+//             buttons: [{title: 'Learn More'}],
+//             isClickable: true,
+//             priority: 2,
+//         }, function () {
+//         });
+//     });
+// }
 
 function doBlock(url, callback) {
     chrome.storage.local.get('blackList', function (items) {
         var blackList = items.blackList;
         if (blackList != null) {
             for (index in blackList) {
-                if (url.indexOf(blackList[index]) > -1) {
+                var blackUrl = blackList[index].split(":")[0];
+                alertMessage = blackList[index].split(":")[1];
+                if (url.indexOf(blackUrl) > -1) {
                     if (!time_range('12:30', '14:00') && !time_range('19:20', '23:59')) {
                         callback();
                         return;
@@ -41,9 +44,15 @@ function doBlock(url, callback) {
 function execute(tabId, url) {
     chrome.tabs.remove(tabId, function () {
         chrome.storage.local.get('alertText', function (items) {
-            alert(items.alertText ? items.alertText : "滚去工作啊！！！");
+            if (alertMessage != null) {
+                alert(alertMessage)
+            } else if (items.alertText != null) {
+                alert(items.alertText)
+            } else {
+                alert("滚去工作啊！！！")
+            }
         })
-    });
+    })
 }
 
 function time_range(beginTime, endTime) {
