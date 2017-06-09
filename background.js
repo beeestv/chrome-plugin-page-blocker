@@ -1,29 +1,8 @@
-var warningId = 'notification.warning';
 var alertMessage;
 
-// function hideWarning(done) {
-//     chrome.notifications.clear(warningId, function () {
-//         if (done) done();
-//     });
-// }
-//
-// function showWarning() {
-//     hideWarning(function () {
-//         chrome.notifications.create(warningId, {
-//             title: 'Page Blocker',
-//             type: 'basic',
-//             message: '滚去工作啊！！',
-//             buttons: [{title: 'Learn More'}],
-//             isClickable: true,
-//             priority: 2,
-//         }, function () {
-//         });
-//     });
-// }
-
 function doBlock(url, callback) {
-    chrome.storage.local.get('blackList', function (items) {
-        var blackList = items.blackList;
+    chrome.storage.local.get('temporaryBlackList', function (items) {
+        var blackList = items.temporaryBlackList;
         if (blackList != null) {
             for (index in blackList) {
                 var blackUrl = blackList[index].split(":")[0];
@@ -35,13 +14,24 @@ function doBlock(url, callback) {
                     }
                 }
             }
-        } else {
-            callback();
+        }
+    })
+    chrome.storage.local.get('permanentBlackList', function (items) {
+        var blackList = items.permanentBlackList;
+        if (blackList != null) {
+            for (index in blackList) {
+                var blackUrl = blackList[index].split(":")[0];
+                alertMessage = blackList[index].split(":")[1];
+                if (url.indexOf(blackUrl) > -1) {
+                    callback();
+                    return;
+                }
+            }
         }
     })
 }
 
-function execute(tabId, url) {
+function execute(tabId) {
     chrome.tabs.remove(tabId, function () {
         chrome.storage.local.get('alertText', function (items) {
             if (alertMessage != null) {

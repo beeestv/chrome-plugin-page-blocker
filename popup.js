@@ -9,9 +9,13 @@ storage.get("enable", function (items) {
 storage.get("alertText", function (items) {
     $('#alert-text').val(items.alertText);
 });
-storage.get('blackList', function (items) {
-    $('#black-list').val(items.blackList.join('\n'));
+storage.get('temporaryBlackList', function (items) {
+    $('#temporary-black-list').val(items.temporaryBlackList.join('\n'));
 });
+storage.get('permanentBlackList', function (items) {
+    $('#permanent-black-list').val(items.permanentBlackList.join('\n'));
+});
+
 $(function () {
     $('#on-off').click(function () {
         var enable = $('#on-off').prop("checked");
@@ -23,9 +27,15 @@ $(function () {
         storage.set({'alertText': $('#alert-text').val()}, function () {});
     });
 
-    $('#black-list').change(function () {
-        var blackListString = $('#black-list').val();
-        var blackList = blackListString.split('\n')
-        storage.set({'blackList':blackList}, function () {})
+    $('#temporary-black-list').change(function () {
+        var temporaryBlackListString = $('#temporary-black-list').val();
+        var temporaryBlackList = temporaryBlackListString.split('\n')
+        storage.set({'temporaryBlackList':temporaryBlackList}, function () {})
+    });
+
+    $('#permanent-black-list').change(function () {
+        var permanentBlackListString = $('#permanent-black-list').val();
+        var permanentBlackList = permanentBlackListString.split('\n')
+        storage.set({'permanentBlackList':permanentBlackList}, function () {})
     });
 });
