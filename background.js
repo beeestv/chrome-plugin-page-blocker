@@ -6,9 +6,9 @@ function doBlock(url, callback) {
         if (blackList != null) {
             for (index in blackList) {
                 var blackUrl = blackList[index].split(":")[0];
-                alertMessage = blackList[index].split(":")[1];
                 if (url.indexOf(blackUrl) > -1) {
                     if (!time_range('12:30', '14:00') && !time_range('19:20', '23:59') && !time_range('00:00', '09:30')) {
+                        alertMessage = blackList[index];
                         callback();
                         return;
                     }
@@ -21,8 +21,8 @@ function doBlock(url, callback) {
         if (blackList != null) {
             for (index in blackList) {
                 var blackUrl = blackList[index].split(":")[0];
-                alertMessage = blackList[index].split(":")[1];
-                if (url.indexOf(blackUrl) > -1) {
+                if (url.indexOf(blackUrl) > -1) {                    
+                    alertMessage = blackList[index];
                     callback();
                     return;
                 }
